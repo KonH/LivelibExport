@@ -15,8 +15,7 @@ def wait_for_delay(delay):
 
 # Page loader to download book pages to cache
 class PageLoader:
-	def __init__(this, books, cache, min_delay, max_delay):
-		this.books = books
+	def __init__(this, cache, min_delay, max_delay):
 		this.cache = cache
 		this.min_delay = min_delay
 		this.max_delay = max_delay
@@ -31,10 +30,10 @@ class PageLoader:
 			cache.save(book.id, page)
 			return True
 
-	def download(this):
+	def download(this, books):
 		count = 1
-		total = len(this.books)
-		for book in this.books:
+		total = len(books)
+		for book in books:
 			print('%s/%s' % (count, total))
 			count += 1
 			if this.try_download_book_page(book):

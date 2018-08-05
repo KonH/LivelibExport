@@ -12,11 +12,8 @@ def format_book(book):
 
 # Write books content to csv file
 class CsvWriter():
-	def __init__(this, books):
-		this.books = books
-
-	def save(this, file_name):
+	def save(this, books, file_name):
 		with open(file_name, 'w') as file:
 			file.write('ID; Title; ISBN; My Rating; Date Added\n')
-			for book in this.books:
+			for book in books:
 				file.write(format_book(book))
