@@ -4,11 +4,11 @@ from book import Book
 
 def parse_isbn_str(isbn_str):
 	raw_isbn_str = isbn_str
-	isbn = raw_isbn_str.split(',')[:1][0]
+	isbn = raw_isbn_str.split(',')[:1][0].split(' ')[0]
 	return isbn
 
 def normalize_isbn(isbn):
-	return isbn.replace('-', '')
+	return isbn.replace('-', '').replace('.', '')
 
 def parse_downloaded_book(book_content, book):
 	if book_content is not None:
