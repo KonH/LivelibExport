@@ -10,15 +10,35 @@ def parse_isbn_str(isbn_str):
 def normalize_isbn(isbn):
 	return isbn.replace('-', '').replace('.', '')
 
+def first_text_or_none(items):
+	if len(items) > 0:
+		return items[0].text
+	else:
+		return None
+
+def try_extract_name_from_span(book_html):
+	name_spans = book_html.xpath('//span[@itemprop="name"]')
+	return first_text_or_none(name_spans)
+
+def try_extract_name_from_header(book_html):
+	headers = book_html.xpath('//h1[@id=\"book-title\"]')
+	return first_text_or_none(headers)
+
+def try_extract_name(book_html, book):
+	name = try_extract_name_from_span(book_html)
+	if name is not None:
+		book.add_name(name)
+		return
+	name = try_extract_name_from_header(book_html)
+	if name is not None:
+		book.add_name(name)
+		return
+	print('try_extract_name(%s): can\'t find name.' % book.id)	
+
 def parse_downloaded_book(book_content, book):
 	if book_content is not None:
 		book_html = html.fromstring(book_content)
-		name_spans = book_html.xpath('//span[@itemprop="name"]')
-		if len(name_spans) > 0:
-			name = name_spans[0].text
-			book.add_name(name)
-		else:
-			print('parse_downloaded_book(%s): can\'t find name.' % book.id) 
+		try_extract_name(book_html, book)
 		isbn_spans = book_html.xpath('//span[@itemprop="isbn"]')
 		if len(isbn_spans) > 0:
 			raw_isbn = isbn_spans[0].text
