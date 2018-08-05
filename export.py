@@ -2,21 +2,24 @@ import os
 from os import path
 import time
 import random
+import re
 from lxml import html
 from lxml import etree
 from urllib import request
+from collections import defaultdict
 
 class Book:
-	def __init__(this, link, rating):
+	def __init__(this, link, rating, date):
 		this.link = link
 		this.rating = rating
 		this.id = link[6:]
 		this.full_link = 'https://www.livelib.ru' + link
+		this.date = date
 		this.name = None
 		this.ISBN = None
 	
 	def __str__(this):
-		return 'id="%s", link="%s", rating="%s", name="%s", isbn="%s"' % (this.id, this.link, this.rating, this.name, this.ISBN)
+		return 'id="%s", link="%s", rating="%s", name="%s", isbn="%s"' % (this.id, this.link, this.rating, this.date, this.name, this.ISBN)
 
 	def add_isbn(this, isbn):
 		this.ISBN = isbn
@@ -46,7 +49,7 @@ def try_get_link(link):
 		return link
 	return None
 
-def parseBook(row):
+def parseBook(row, date):
 	link = None
 	rating = None
 
@@ -62,7 +65,7 @@ def parseBook(row):
 				link = try_get_link(hrefs[0].get('href'))
 
 	if link is not None and rating is not None:
-		return Book(link, rating)
+		return Book(link, rating, date)
 	if link is not None:
 		print('Parsing error (rating not parsed):')
 		print(etree.tostring(row))
@@ -72,6 +75,51 @@ def parseBook(row):
 		print(etree.tostring(row))
 		print('')
 	return None
+
+def try_parse_month(raw_month):
+	dict = defaultdict(lambda: '01', {
+		'Январь': '01',
+		'Февраль': '02',
+		'Март': '03',
+		'Апрель': '04',
+		'Май': '05',
+		'Июнь': '06',
+		'Июль': '07',
+		'Август': '08',
+		'Сентябрь': '09',
+		'Октябрь': '10',
+		'Ноябрь': '11',
+		'Декабрь': '12'
+	})
+	return dict[raw_month]
+
+def try_parse_date(row):
+	headers = row.xpath('.//td/h2')
+	for header in headers:
+		raw_text = header.text
+		if raw_text is not None:
+			m = re.search('\d{4} г.', raw_text)
+			if m is not None:
+				year = m.group(0).split(' ')[0]
+				raw_month = raw_text.split(' ')[0]
+				month = try_parse_month(raw_month)
+				return '%s-%s-01' % (year, month)
+	return None
+
+def parse_books(content):
+	books = []
+	books_html = html.fromstring(content)
+	rows = books_html.xpath('//tr')
+	last_date = None
+	for row in rows:
+		result = parseBook(row, last_date)
+		if result is not None:
+			books.append(result)
+		else:
+			date = try_parse_date(row)
+			if date is not None:
+				last_date = date
+	return books
 
 def ensure_cache_dir(cache_dir):
 	if not path.exists(cache_dir):
@@ -118,16 +166,6 @@ def download_book_pages(books, cache_dir, min_delay, max_delay):
 			delay = random.randint(min_delay, max_delay)
 			wait_for_delay(delay)
 		print()
-
-def parse_books(content):
-	books = []
-	books_html = html.fromstring(content)
-	rows = books_html.xpath('//tr')
-	for row in rows:
-		result = parseBook(row)
-		if result is not None:
-			books.append(result)
-	return books
 
 def load_book_content_from_cache(cache_dir, id):
 	file_name = get_path_in_cache(cache_dir, id)
@@ -180,11 +218,11 @@ def str_or_empty(str):
 		return str
 
 def format_book(book):
-	return "%s; %s; %s; %s\n" % (book.id, str_or_empty(book.name), str_or_empty(book.ISBN), book.rating)
+	return "%s; %s; %s; %s; %s\n" % (book.id, str_or_empty(book.name), str_or_empty(book.ISBN), book.rating, book.date)
 
 def save_books(books, file_name):
 	with open(file_name, 'w') as file:
-		file.write('ID; Title; ISBN; My Rating\n')
+		file.write('ID; Title; ISBN; My Rating; Date Added\n')
 		for book in books:
 			file.write(format_book(book))
 
