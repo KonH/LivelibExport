@@ -1,4 +1,5 @@
 .vscode
 cache
+__pycache__
 read.html
 out.csv
