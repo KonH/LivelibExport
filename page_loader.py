@@ -27,7 +27,7 @@ class PageLoader:
 			return False
 		else:
 			page = download_book_page(book.full_link)
-			cache.save(book.id, page)
+			this.cache.save(book.id, page)
 			return True
 
 	def download(this, books):
