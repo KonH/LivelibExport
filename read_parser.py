@@ -14,7 +14,7 @@ def get_rating_from_class(rating_class):
 		return None
 
 def try_get_link(link):
-	if link.startswith("/book/"):
+	if "/book/" in link:
 		return link
 	return None
 
