@@ -2,8 +2,8 @@ class Book:
 	def __init__(this, link, rating, date):
 		this.link = link
 		this.rating = rating
-		this.id = link[6:]
-		this.full_link = 'https://www.livelib.ru' + link
+		this.id = link[link.rfind("/")+1:]
+		this.full_link = link
 		this.date = date
 		this.name = None
 		this.ISBN = None
