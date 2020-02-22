@@ -13,7 +13,7 @@ def format_book(book):
 # Write books content to csv file
 class CsvWriter():
 	def save(this, books, file_name):
-		with open(file_name, 'w') as file:
+		with open(file_name, 'w', encoding="utf-8") as file:
 			file.write('ID; Title; ISBN; My Rating; Date Added\n')
 			for book in books:
 				file.write(format_book(book))

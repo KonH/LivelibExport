@@ -79,7 +79,7 @@ def try_parse_date(row):
 class ReadParser:
 	def load_from_file(this, file_name):
 		try:
-			with open(file_name, 'r') as file:
+			with open(file_name, 'r', encoding="utf-8") as file:
 				this.content = file.read()
 				return True
 		except Exception as ex:
