@@ -26,7 +26,7 @@ class CacheManager:
 	def load(this, id):
 		file_name = this.get_path(id)
 		try:
-			with open(file_name, 'r') as file:
+			with open(file_name, 'r', encoding="utf-8") as file:
 				return file.read()
 		except Exception as ex:
 			print('load_book_content_from_cache("%s"): %s' % (file_name, ex))
