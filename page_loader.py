@@ -4,7 +4,10 @@ from urllib import request
 
 def download_book_page(link):
 	print('Start download page from "%s"' % link)
-	with request.urlopen(link) as data:
+	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'}
+	req = request.Request(link, headers = headers)
+	r = request.urlopen(req)
+	with r as data:
 		content = data.read()
 		print('Page downloaded.')
 		return content
