@@ -3,7 +3,6 @@ class Book:
 		this.link = link
 		this.rating = rating
 		this.id = link[link.rfind("/")+1:]
-		this.full_link = "https://livelib.ru" + link
 		this.date = date
 		this.name = None
 		this.ISBN = None
