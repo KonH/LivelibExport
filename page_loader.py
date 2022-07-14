@@ -24,12 +24,13 @@ class PageLoader:
 		this.max_delay = max_delay
 
 	def try_download_book_page(this, book):
-		print('Downloading book with id = "%s" from "%s"' % (book.id, book.full_link))
+		full_link = "https://livelib.ru/book/" + book.id
+		print('Downloading book with id = "%s" from "%s"' % (book.id, full_link))
 		if this.cache.is_cached(book.id):
 			print('Already in cache, skipping.')
 			return False
 		else:
-			page = download_book_page(book.full_link)
+			page = download_book_page(full_link)
 			this.cache.save(book.id, page)
 			return True
 
