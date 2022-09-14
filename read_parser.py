@@ -13,6 +13,17 @@ def get_rating_from_class(rating_class):
 		print('get_rating_from_class("%s"): %s' % (rating_class, ex))
 		return None
 
+def get_max_rating_from_title(rating_title):
+	try:
+		parts = rating_title.split()
+		return int(parts[-1])
+	except ValueError:
+		# Case for 'нет рейтинга' string
+		return None
+	except Exception as ex:
+		print('get_max_rating_from_title("%s"): %s' % (rating_title, ex))
+		return None
+
 def try_get_link(link):
 	if "/book/" in link:
 		return link
@@ -21,26 +32,28 @@ def try_get_link(link):
 def parse_book(row, last_date):
 	link = None
 	rating = None
+	max_rating = None
 
 	for cell in row.iter():
 		if rating is None:
 			spans = cell.xpath('.//span')
 			if len(spans) == 2:
 				rating_class = spans[1].get('class')
+				rating_title = spans[1].get('title')
 				rating = get_rating_from_class(rating_class)
+				max_rating = get_max_rating_from_title(rating_title)
 		if link is None:
 			hrefs = cell.xpath('.//a')
 			for href in hrefs:
 				link = try_get_link(hrefs[0].get('href'))
 
 	if link is not None and rating is not None:
-		return Book(link, rating, last_date)
-	if link is not None:
-		print('Parsing error (rating not parsed):')
-		print(etree.tostring(row))
-		print('')
-	if rating is not None:
-		print('Parsing error (link not parsed):')
+		return Book(link, rating, max_rating, last_date)
+	if link is not None or rating is not None:
+		if link is None:
+			print('Parsing error (link is not parsed):')
+		if rating is None:
+			print('Parsing error (rating is not parsed):')
 		print(etree.tostring(row))
 		print('')
 	return None
