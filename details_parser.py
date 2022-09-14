@@ -21,7 +21,7 @@ def try_extract_name_from_span(book_html):
 	return first_text_or_none(name_spans)
 
 def try_extract_name_from_header(book_html):
-	headers = book_html.xpath('//h1[@id=\"book-title\"]')
+	headers = book_html.xpath('//h1')
 	return first_text_or_none(headers)
 
 def try_extract_name(book_html, book):
@@ -39,9 +39,9 @@ def parse_downloaded_book(book_content, book):
 	if book_content is not None:
 		book_html = html.fromstring(book_content)
 		try_extract_name(book_html, book)
-		isbn_spans = book_html.xpath('//span[@itemprop="isbn"]')
+		isbn_spans = book_html.xpath('/html/head/meta[@property="book:isbn"]/@content')
 		if len(isbn_spans) > 0:
-			raw_isbn = isbn_spans[0].text
+			raw_isbn = isbn_spans[0]
 			isbn = normalize_isbn(parse_isbn_str(raw_isbn))
 			book.add_isbn(isbn)
 		else:
