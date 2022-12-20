@@ -16,20 +16,26 @@ min_delay = 90
 max_delay = 120
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "", ["convert-10-star-rating=", "rating-convert-ceiling="])
+	opts, args = getopt.getopt(sys.argv[1:], '', ['convert-10-star-rating=', 'rating-convert-ceiling=', 'min-delay=', 'max-delay='])
 except getopt.GetoptError:
 	print('You can specify custom rating behaviour (defaults below):')
-	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True')
+	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True --min-delay=90 --max-delay=120')
 
 convert_10_star_rating = True
 rating_convert_ceiling = True
 for opt, arg in opts:
-	if opt == "--convert-10-star-rating":
-		convert_10_star_rating = arg == "True"
-	if opt == "--rating-convert-ceiling":
-		rating_convert_ceiling = arg == "True"
+	if opt == '--convert-10-star-rating':
+		convert_10_star_rating = arg == 'True'
+	if opt == '--rating-convert-ceiling':
+		rating_convert_ceiling = arg == 'True'
+	if opt == '--min-delay':
+		min_delay = int(arg)
+	if opt == '--max-delay':
+		max_delay = int(arg)
 print('Convert 10-star rating (defaults: True): %s' % convert_10_star_rating)
 print('Ceil rating while converting (defaults: True): %s' % rating_convert_ceiling)
+print('Min delay (defaults: 90): %s' % min_delay)
+print('Max delay (defaults: 120): %s' % max_delay)
 
 print('Load books from file: "%s"' % input_file_name)
 read_parser = ReadParser()
