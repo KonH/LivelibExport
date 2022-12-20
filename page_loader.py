@@ -2,13 +2,20 @@ import time
 import random
 from urllib import request
 
+def assert_page_content(content: bytes):
+	str = content.decode('utf-8')
+	if 'captcha-show' in str:
+		print('Suspicios page content: %s' % str)
+		raise Exception('DDoS protection page found, please adjust your settings and wait some time')
+
 def download_book_page(link):
 	print('Start download page from "%s"' % link)
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'}
 	req = request.Request(link, headers = headers)
 	r = request.urlopen(req)
 	with r as data:
-		content = data.read()
+		content: bytes = data.read()
+		assert_page_content(content)
 		print('Page downloaded.')
 		return content
 
