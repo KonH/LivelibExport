@@ -1,4 +1,3 @@
-from book import Book
 from read_parser import ReadParser
 from csv_writer import CsvWriter
 from details_parser import DetailsParser
@@ -8,21 +7,23 @@ from rating_processor import RatingProcessor
 
 import sys, getopt
 
+try:
+	opts, args = getopt.getopt(sys.argv[1:], '', ['convert-10-star-rating=', 'rating-convert-ceiling=', 'min-delay=', 'max-delay=', 'proxy-host='])
+except getopt.GetoptError:
+	print('You can specify additional parameters (defaults below):')
+	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True --min-delay=90 --max-delay=120 --proxy-host=')
+	exit()
+
 # settings
 input_file_name = 'read.html'
 cache_dir_name = 'cache'
 out_file_name = 'out.csv'
-min_delay = 90
-max_delay = 120
-
-try:
-	opts, args = getopt.getopt(sys.argv[1:], '', ['convert-10-star-rating=', 'rating-convert-ceiling=', 'min-delay=', 'max-delay='])
-except getopt.GetoptError:
-	print('You can specify custom rating behaviour (defaults below):')
-	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True --min-delay=90 --max-delay=120')
-
 convert_10_star_rating = True
 rating_convert_ceiling = True
+min_delay = 90
+max_delay = 120
+proxy_host = ''
+
 for opt, arg in opts:
 	if opt == '--convert-10-star-rating':
 		convert_10_star_rating = arg == 'True'
@@ -32,10 +33,13 @@ for opt, arg in opts:
 		min_delay = int(arg)
 	if opt == '--max-delay':
 		max_delay = int(arg)
+	if opt == '--proxy-host':
+		proxy_host = arg
 print('Convert 10-star rating (defaults: True): %s' % convert_10_star_rating)
 print('Ceil rating while converting (defaults: True): %s' % rating_convert_ceiling)
 print('Min delay (defaults: 90): %s' % min_delay)
 print('Max delay (defaults: 120): %s' % max_delay)
+print('Proxy host (defaults: \'\'): %s' % proxy_host)
 
 print('Load books from file: "%s"' % input_file_name)
 read_parser = ReadParser()
@@ -49,7 +53,7 @@ print('Books parsed: %s.' % len(books))
 
 print('Start download detailed book pages.')
 cache = CacheManager(cache_dir_name)
-loader = PageLoader(cache, min_delay, max_delay)
+loader = PageLoader(cache, min_delay, max_delay, proxy_host)
 loader.download(books)
 print('Detailed book pages downloaded.')
 
