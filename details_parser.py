@@ -1,13 +1,13 @@
 from lxml import html
-from lxml import etree
 from book import Book
+from cache_manager import CacheManager
 
-def parse_isbn_str(isbn_str):
+def parse_isbn_str(isbn_str: str):
 	raw_isbn_str = isbn_str
 	isbn = raw_isbn_str.split(',')[:1][0].split(' ')[0]
 	return isbn
 
-def normalize_isbn(isbn):
+def normalize_isbn(isbn: str):
 	return isbn.replace('-', '').replace('.', '')
 
 def first_text_or_none(items):
@@ -24,7 +24,7 @@ def try_extract_name_from_header(book_html):
 	headers = book_html.xpath('//h1')
 	return first_text_or_none(headers)
 
-def try_extract_name(book_html, book):
+def try_extract_name(book_html, book: Book):
 	name = try_extract_name_from_span(book_html)
 	if name is not None:
 		book.add_name(name)
@@ -35,7 +35,7 @@ def try_extract_name(book_html, book):
 		return
 	print('try_extract_name(%s): can\'t find name.' % book.id)	
 
-def parse_downloaded_book(book_content, book):
+def parse_downloaded_book(book_content: str, book: Book):
 	if book_content is not None:
 		book_html = html.fromstring(book_content)
 		try_extract_name(book_html, book)
@@ -50,10 +50,10 @@ def parse_downloaded_book(book_content, book):
 
 # Parse detail pages to update Book entries
 class DetailsParser:
-	def __init__(this, cache):
+	def __init__(this, cache: CacheManager):
 		this.cache = cache
 
-	def parse(this, books):
+	def parse(this, books: list[Book]):
 		ready_books = []
 		for book in books:
 			book_content = this.cache.load(book.id)

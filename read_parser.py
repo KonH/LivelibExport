@@ -4,7 +4,7 @@ from lxml import html
 from lxml import etree
 from book import Book
 
-def get_rating_from_title(rating_title):
+def get_rating_from_title(rating_title: str):
 	try:
 		parts = rating_title.split()
 		return int(parts[-3])
@@ -15,7 +15,7 @@ def get_rating_from_title(rating_title):
 		print('get_rating_from_title("%s"): %s' % (rating_title, ex))
 		return None
 
-def get_max_rating_from_title(rating_title):
+def get_max_rating_from_title(rating_title: str):
 	try:
 		parts = rating_title.split()
 		return int(parts[-1])
@@ -26,12 +26,12 @@ def get_max_rating_from_title(rating_title):
 		print('get_max_rating_from_title("%s"): %s' % (rating_title, ex))
 		return None
 
-def try_get_link(link):
+def try_get_link(link: str):
 	if "/book/" in link:
 		return link
 	return None
 
-def parse_book(row, last_date):
+def parse_book(row, last_date: str):
 	link = None
 	rating = None
 	max_rating = None
@@ -59,7 +59,7 @@ def parse_book(row, last_date):
 		print('')
 	return None
 
-def try_parse_month(raw_month):
+def try_parse_month(raw_month: str):
 	dict = defaultdict(lambda: '01', {
 		'Январь': '01',
 		'Февраль': '02',
@@ -91,7 +91,7 @@ def try_parse_date(row):
 
 # ReadParser - parse read list in html format
 class ReadParser:
-	def load_from_file(this, file_name):
+	def load_from_file(this, file_name: str):
 		try:
 			with open(file_name, 'r', encoding="utf-8") as file:
 				this.content = file.read()
@@ -101,7 +101,7 @@ class ReadParser:
 			this.content = None
 			return False
 
-	def parse_books(this):
+	def parse_books(this) -> list[Book]:
 		books = []
 		books_html = html.fromstring(this.content)
 		rows = books_html.xpath('//tr')

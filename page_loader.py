@@ -108,7 +108,7 @@ def download_book_page(link: str, proxy_host: str):
 	else:
 		return download_book_page_direct(link)
 
-def wait_for_delay(delay):
+def wait_for_delay(delay: int):
 	print("Waiting %s sec..." % delay)
 	time.sleep(delay)
 
@@ -131,7 +131,7 @@ class PageLoader:
 			this.cache.save(book.id, page)
 			return True
 
-	def download(this, books):
+	def download(this, books: list[Book]):
 		count = 1
 		total = len(books)
 		if this.proxy_host:
