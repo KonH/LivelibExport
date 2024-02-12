@@ -9,8 +9,12 @@ def get_rating_from_title(rating_title: str):
 		parts = rating_title.split()
 		return int(parts[-3])
 	except ValueError:
-		# Case for 'нет рейтинга' string
-		return None
+		try:
+			parts = rating_title.split()
+			return float(parts[-3])
+		except ValueError:
+			# Case for 'нет рейтинга' string
+			return None
 	except Exception as ex:
 		print('get_rating_from_title("%s"): %s' % (rating_title, ex))
 		return None
