@@ -5,7 +5,7 @@ from book import Book
 class RatingProcessor:
 	def is_applicable(this, books: list[Book]):
 		for book in books:
-			if book.max_rating is not None and book.max_rating > 5:
+			if (book.max_rating is not None and book.max_rating > 5) or isinstance(book.rating, float):
 				return True
 		return False
 
@@ -16,4 +16,4 @@ class RatingProcessor:
 				if ceil:
 					book.rating = math.ceil(raw_rating)
 				else:
-					book.rating = round(raw_rating)
+					book.rating = math.floor(raw_rating)
