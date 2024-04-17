@@ -7,8 +7,11 @@ def str_or_empty(str):
 	else:
 		return str
 
+def rating_or_empty(rating):
+	return rating if rating != -1 else ''
+
 def format_book(book: Book):
-	return "%s; %s; %s; %s; %s\n" % (book.id, str_or_empty(book.name), str_or_empty(book.ISBN), book.rating, book.date)
+	return "%s; %s; %s; %s; %s\n" % (book.id, str_or_empty(book.name), str_or_empty(book.ISBN), rating_or_empty(book.rating), book.date)
 
 # Write books content to csv file
 class CsvWriter():
