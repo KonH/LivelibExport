@@ -28,11 +28,15 @@ def try_extract_authors_from_link(book_html):
 	return unique_texts(links)
 
 def try_extract_authors(book_html, book: Book):
-	author = try_extract_authors_from_link(book_html)
-	if author is not None:
-		book.add_authors(author)
-		return
-	print('try_extract_authors(%s): can\'t find authors.' % book.id)
+	try:
+		authors = try_extract_authors_from_link(book_html)
+		if authors:
+			book.add_authors(authors)
+			return
+		print('try_extract_authors(%s): can\'t find authors.' % book.id)
+	except Exception as ex:
+		print('try_extract_authors(%s): can\'t find authors: %s' % (book.id, ex))
+
 
 def try_extract_name_from_span(book_html):
 	name_spans = book_html.xpath('//span[@itemprop="name"]')
