@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from lxml import html
 from book import Book
 from cache_manager import CacheManager
@@ -10,11 +11,28 @@ def parse_isbn_str(isbn_str: str):
 def normalize_isbn(isbn: str):
 	return isbn.replace('-', '').replace('.', '')
 
+def unique_texts(items):
+	if len(items) > 0:
+		return OrderedDict.fromkeys([item.text for item in items]).keys()
+	else:
+		return None
+
 def first_text_or_none(items):
 	if len(items) > 0:
 		return items[0].text
 	else:
 		return None
+
+def try_extract_authors_from_link(book_html):
+	links = book_html.xpath('//a[starts-with(@class,"bc-author__link")]')
+	return unique_texts(links)
+
+def try_extract_authors(book_html, book: Book):
+	author = try_extract_authors_from_link(book_html)
+	if author is not None:
+		book.add_authors(author)
+		return
+	print('try_extract_authors(%s): can\'t find authors.' % book.id)
 
 def try_extract_name_from_span(book_html):
 	name_spans = book_html.xpath('//span[@itemprop="name"]')
@@ -38,6 +56,7 @@ def try_extract_name(book_html, book: Book):
 def parse_downloaded_book(book_content: str, book: Book):
 	if book_content is not None:
 		book_html = html.fromstring(book_content)
+		try_extract_authors(book_html, book)
 		try_extract_name(book_html, book)
 		isbn_spans = book_html.xpath('/html/head/meta[@property="book:isbn"]/@content')
 		if len(isbn_spans) > 0:
