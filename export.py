@@ -8,10 +8,10 @@ from rating_processor import RatingProcessor
 import sys, getopt
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], '', ['convert-10-star-rating=', 'rating-convert-ceiling=', 'min-delay=', 'max-delay=', 'proxy-host='])
+	opts, args = getopt.getopt(sys.argv[1:], '', ['convert-10-star-rating=', 'rating-convert-ceiling=', 'parse-books-without-rating=', 'min-delay=', 'max-delay=', 'proxy-host='])
 except getopt.GetoptError:
 	print('You can specify additional parameters (defaults below):')
-	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True --min-delay=90 --max-delay=120 --proxy-host=')
+	print('test.py --convert-10-star-rating=True --rating-convert-ceiling=True --parse-books-without-rating=False --min-delay=90 --max-delay=120 --proxy-host=')
 	exit()
 
 # settings
@@ -20,6 +20,7 @@ cache_dir_name = 'cache'
 out_file_name = 'out.csv'
 convert_10_star_rating = True
 rating_convert_ceiling = True
+parse_books_without_rating = False
 min_delay = 90
 max_delay = 120
 proxy_host = ''
@@ -29,6 +30,8 @@ for opt, arg in opts:
 		convert_10_star_rating = arg == 'True'
 	if opt == '--rating-convert-ceiling':
 		rating_convert_ceiling = arg == 'True'
+	if opt == '--parse-books-without-rating':
+		parse_books_without_rating = arg == 'True'
 	if opt == '--min-delay':
 		min_delay = int(arg)
 	if opt == '--max-delay':
@@ -37,6 +40,7 @@ for opt, arg in opts:
 		proxy_host = arg
 print('Convert 10-star rating (defaults: True): %s' % convert_10_star_rating)
 print('Ceil rating while converting (defaults: True): %s' % rating_convert_ceiling)
+print('Parse books without rating (defaults: False): %s' % parse_books_without_rating)
 print('Min delay (defaults: 90): %s' % min_delay)
 print('Max delay (defaults: 120): %s' % max_delay)
 print('Proxy host (defaults: \'\'): %s' % proxy_host)
@@ -48,7 +52,7 @@ if read_parser.load_from_file(input_file_name) is False:
 print('Books loaded.')
 
 print('Parse books from summary.')
-books = read_parser.parse_books()
+books = read_parser.parse_books(parse_books_without_rating)
 print('Books parsed: %s.' % len(books))
 
 print('Start download detailed book pages.')

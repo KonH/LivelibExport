@@ -5,13 +5,13 @@ from book import Book
 class RatingProcessor:
 	def is_applicable(this, books: list[Book]):
 		for book in books:
-			if (book.max_rating is not None and book.max_rating > 5) or isinstance(book.rating, float):
+			if (book.max_rating is not None and book.max_rating > 5 and book.rating != -1) or isinstance(book.rating, float):
 				return True
 		return False
 
 	def change_rating(this, books: list[Book], ceil: bool):
 		for book in books:
-			if book.max_rating is not None:
+			if book.max_rating is not None and book.rating != -1:
 				raw_rating = (book.rating / (book.max_rating / 5))
 				if ceil:
 					book.rating = math.ceil(raw_rating)

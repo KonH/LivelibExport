@@ -7,12 +7,11 @@ from book import Book
 def get_rating_from_title(rating_title: str):
 	try:
 		parts = rating_title.split()
-		return int(parts[-3])
-	except ValueError:
 		try:
-			parts = rating_title.split()
-			return float(parts[-3])
+			return int(parts[-3])
 		except ValueError:
+			return float(parts[-3])
+		except IndexError:
 			# Case for 'нет рейтинга' string
 			return None
 	except Exception as ex:
@@ -35,7 +34,7 @@ def try_get_link(link: str):
 		return link
 	return None
 
-def parse_book(row, last_date: str):
+def parse_book(row, last_date: str, without_rating: bool):
 	link = None
 	rating = None
 	max_rating = None
@@ -51,6 +50,9 @@ def parse_book(row, last_date: str):
 			hrefs = cell.xpath('.//a')
 			for href in hrefs:
 				link = try_get_link(hrefs[0].get('href'))
+
+	if rating is None and without_rating:
+		rating = -1
 
 	if link is not None and rating is not None:
 		return Book(link, rating, max_rating, last_date)
@@ -105,13 +107,13 @@ class ReadParser:
 			this.content = None
 			return False
 
-	def parse_books(this) -> list[Book]:
+	def parse_books(this, without_rating: bool) -> list[Book]:
 		books = []
 		books_html = html.fromstring(this.content)
 		rows = books_html.xpath('//tr')
 		last_date = None
 		for row in rows:
-			result = parse_book(row, last_date)
+			result = parse_book(row, last_date, without_rating)
 			if result is not None:
 				books.append(result)
 			else:
