@@ -120,13 +120,15 @@ class PageLoader:
 		this.max_delay = max_delay
 		this.proxy_host = proxy_host
 
-	def try_download_book_page(this, book: Book):
+	def try_download_book_page(this, book: Book, delay: int):
 		full_link = "https://livelib.ru/book/" + book.id
 		print('Downloading book with id = "%s" from "%s"' % (book.id, full_link))
 		if this.cache.is_cached(book.id):
 			print('Already in cache, skipping.')
 			return False
 		else:
+			if delay:
+				wait_for_delay(delay)
 			page = download_book_page(full_link, this.proxy_host)
 			this.cache.save(book.id, page)
 			return True
@@ -136,12 +138,12 @@ class PageLoader:
 		total = len(books)
 		if this.proxy_host:
 			create_proxy_session(this.proxy_host)
+		delay = 0
 		for book in books:
 			print('%s/%s' % (count, total))
 			count += 1
-			if this.try_download_book_page(book):
+			if this.try_download_book_page(book, delay):
 				delay = random.randint(this.min_delay, this.max_delay)
-				wait_for_delay(delay)
 			print()
 		if this.proxy_host:
 			destroy_proxy_session(this.proxy_host)
