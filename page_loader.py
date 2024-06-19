@@ -2,7 +2,7 @@ import time
 import random
 import json
 import http
-from urllib import request
+from urllib import request, error
 
 from book import Book
 from cache_manager import CacheManager
@@ -17,12 +17,19 @@ def download_book_page_direct(link: str):
 	print('Start direct download page from "%s"' % link)
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'}
 	req = request.Request(link, headers = headers)
-	r = request.urlopen(req)
-	with r as data:
-		content: bytes = data.read()
-		assert_page_content(content)
-		print('Page downloaded.')
-		return content
+	try:
+		r = request.urlopen(req)
+		with r as data:
+			content: bytes = data.read()
+			assert_page_content(content)
+			print('Page downloaded.')
+			return content
+	except error.HTTPError as e:
+		print('HTTP error: %s' % e)
+		if hasattr(e, 'read'):
+			content: bytes = e.read()
+			print('Page contents: %s' % content)
+		raise e
 
 def create_proxy_session(proxy_host: str):
 	print('Create proxy session for "%s"' % proxy_host)
