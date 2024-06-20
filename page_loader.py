@@ -15,7 +15,13 @@ def assert_page_content(content: bytes):
 
 def download_book_page_direct(link: str):
 	print('Start direct download page from "%s"' % link)
-	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0'}
+	headers = {}
+	with open('headers.txt', 'r') as file:
+		for line in file:
+			key, value = line.strip().split(': ')
+			headers[key] = value
+	if 'Accept-Encoding' in headers:
+		del headers['Accept-Encoding'] # Breaks request reading
 	req = request.Request(link, headers = headers)
 	try:
 		r = request.urlopen(req)
